@@ -28,7 +28,7 @@ def get_artist(name):
     if len(items) > 0:
         return items[0]
     else:
-        return None
+        raise ValueError("This artist does not exist in Spotify: {}".format(name))
 		
 def show_artist_albums(artist):
     albums = []
@@ -44,7 +44,33 @@ def show_artist_albums(artist):
         if name not in seen:
             print((' ' + name))
             seen.add(name)
+
+def get_playlist(user="spotify", playlist_name="This is: Deep Purple"):
+	user_results = sp.user_playlists(user=user)
+	items = user_results['items']
+	playlist_results = []
+	for item in items:
+		if item['name'] == playlist_name:
+			playlist_results.append(item)
+	if len(playlist_results) > 0:
+		return playlist_results[0]
+	else:
+		raise ValueError("User ({}) does not have playlist ({})".format(user, playlist_name))
+		
+def show_tracks(tracks):
+	for i, item in enumerate(tracks['items']):
+		track = item['track']
+		print "   %d %32.32s %s" % (i, track['artists'][0]['name'], track['name'])
+		
+def get_tracks(playlist):
+	#return playlist['tracks']
+	return sp.user_playlist(username, playlist['id'], fields="tracks")['tracks']
 		
 name = raw_input("Specify artist:")
 show_artist_albums(get_artist(name))
+
+playlist_name = raw_input("Specify playlist:")
+playlist = get_playlist(playlist_name=playlist_name)
+show_tracks(get_tracks(playlist))
+
 
